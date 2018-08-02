@@ -109,8 +109,6 @@ class SimpleGridGraph(object):
             nodeLocation.append((nodeX,nodeY,name))
         self.node_display_locations = nodeLocation
 
-
-
 ###########################################################
 #  A testing program of your implementaion of GridGraph class.
 ###########################################################

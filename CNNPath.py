@@ -52,13 +52,13 @@ class GUI(object):
 
     def drawGrid(self, event = None):
         self.graph = GridGraph()
-        self.graph.set_grid_rows(10)
-        self.graph.set_grid_cols(10)
+        self.graph.set_grid_rows(3)
+        self.graph.set_grid_cols(3)
 
-        self.start_node = '0-0-1-1'
-        self.goal_node = '4-0-0-4'
+        self.start_node = '1-0-1-1'
+        self.goal_node = '1-1-1-0'
 
-        self.graph.obs_list = ([3,0],[1,0],[1,2], [1,4])
+        self.graph.obs_list = ([0,0],[0,1],[2,0],[2,1])
 
         self.graph.set_start(self.start_node)
         self.graph.set_goal(self.goal_node)
@@ -91,9 +91,11 @@ class GUI(object):
 
     def executePath(self, event = None):
         t1 = threading.Thread(name = "Actions 1 Execution", target = self.execute_path, args = (self.actions1,1))
+        t1.setDaemon(True)
         t1.start()
 
         t2 = threading.Thread(name = "Actions 2 Execution", target = self.execute_path, args = (self.actions2,2))
+        t2.setDaemon(True)
         t2.start()
 
     def stopProg(self, event = None):
@@ -104,12 +106,12 @@ class GUI(object):
     def display_graph(self):
         temp_graph = SimpleGridGraph()
 
-        temp_graph.set_grid_rows(10)
-        temp_graph.set_grid_cols(10)
+        temp_graph.set_grid_rows(3)
+        temp_graph.set_grid_cols(3)
 
         # origin of grid is (0, 0) lower left corner
         # graph.obs_list = ([1,1],)    # in case of one obs. COMMA
-        temp_graph.obs_list = ([3,0],[1,0],[1,2], [1,4])
+        temp_graph.obs_list = self.graph.obs_list = ([0,0],[0,1],[2,0],[2,1])
         
         temp_graph.make_grid()
         temp_graph.connect_nodes()
@@ -168,8 +170,10 @@ class GUI(object):
                 plan.append("l")
             elif (node2Y>node1Y):
                 plan.append("u")
-            elif (node2Y>node1Y):
+            elif (node2Y<node1Y):
                 plan.append("d")
+        
+        print plan
         
         prev = 'u'
         for direction in plan:
@@ -221,9 +225,11 @@ class GUI(object):
         return planned_path
 
     def execute_path(self, actions, index):
-        while len(self.pl anned_path)>0:
+        while len(actions)>0:
             if self.robotList:
-                command = self.planned_path.pop(0)
+                self.robotList[index-1].set_led(0,index*3)
+                self.robotList[index-1].set_led(1,index*3)
+                command = actions.pop(0)
                 if command == 'f':
                     self.move_f(index)
                 elif command == 'l':
@@ -232,19 +238,35 @@ class GUI(object):
                     self.turn_r(index)
 
     def move_f(self, index):
-        print "move_f"
+        #print "move_f"
         robot = self.robotList[index-1]
+
         robot.set_wheel(0,20)
         robot.set_wheel(1,20)
         time.sleep(0.1)
-        while (robot.get_floor(0) > 50 and robot.get_floor(1) > 50):
-            time.sleep(0.01)
+
+        while (robot.get_floor(0) > 50 or robot.get_floor(1) > 50):
+            if robot.get_floor(0) < 20:
+                robot.set_wheel(0,8)
+                robot.set_wheel(1,20)
+                time.sleep(0.05)
+            elif robot.get_floor(1) < 20:
+                robot.set_wheel(0,20)
+                robot.set_wheel(1,8)
+                time.sleep(0.05)
+            else:
+                robot.set_wheel(0,20)
+                robot.set_wheel(1,20)
+                time.sleep(0.01)
+
+        robot.set_musical_note(40)
         time.sleep(0.7)
+        robot.set_musical_note(0)
         robot.set_wheel(0,0)
         robot.set_wheel(1,0)
 
     def turn_l(self, index):
-        print "turn_l"
+        #print "turn_l"
         robot = self.robotList[index-1]
         robot.set_wheel(0,-30)
         robot.set_wheel(1,30)
@@ -256,7 +278,7 @@ class GUI(object):
         robot.set_wheel(1,0)
 
     def turn_r(self, index):
-        print "turn_r"
+        #print "turn_r"
         robot = self.robotList[index-1]
         robot.set_wheel(0,30)
         robot.set_wheel(1,-30)
