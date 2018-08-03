@@ -8,6 +8,7 @@ import logging
 from mr_grid_graph import GridGraph
 from starter_bfs import BFS
 from starter_grid_graph import SimpleGridGraph
+from detect_aruco import *
 
 class GUI(object):
     def __init__(self, root, robotList):
@@ -19,7 +20,7 @@ class GUI(object):
         self.initUI()
 
     def initUI(self):
-        self.canvas = tk.Canvas(self.root, bg = 'gray', width = 1440, height = 790)
+        self.canvas = tk.Canvas(self.root, bg = 'gray', width = 790, height = 790)
         self.canvas.pack()
 
         self.b1 = tk.Button(self.root, text='Scan Image', height = 100, width = 10)
@@ -43,22 +44,16 @@ class GUI(object):
         self.b5.bind('<Button-1>', self.stopProg)
 
     def scanImage(self, event = None):
-        self.img = None
-        if self.img:
-            self.canvas.create_image(1420,20, anchor=tk.NE, image=self.img)
-        else:
-            self.img = tk.PhotoImage(file="photo.gif")
-            self.canvas.create_image(1420,20, anchor=tk.NE, image= self.img)
+        d = main_boi()
+        self.obs_list = d["obs"]
+        self.start_node = str(d["start"][0][0]) + "-"+str(d["start"][0][1]) +"-"+ str(d["start"][1][0]) + "-" + str(d["start"][1][1])
+        self.goal_node = str(d["end"][0][0]) + "-"+str(d["end"][0][1]) +"-"+ str(d["end"][1][0]) + "-" + str(d["end"][1][1])
+        
 
     def drawGrid(self, event = None):
         self.graph = GridGraph()
         self.graph.set_grid_rows(3)
         self.graph.set_grid_cols(3)
-
-        self.start_node = '1-0-1-1'
-        self.goal_node = '1-1-1-0'
-
-        self.graph.obs_list = ([0,0],[0,1],[2,0],[2,1])
 
         self.graph.set_start(self.start_node)
         self.graph.set_goal(self.goal_node)
@@ -70,6 +65,11 @@ class GUI(object):
 
 
     def planPath(self, event = None):
+        self.robotList[0].set_led(0,3)
+        self.robotList[0].set_led(0,3)
+        self.robotList[1].set_led(1,3)
+        self.robotList[1].set_led(1,3)
+
         bfs = BFS(self.graph)
         path = bfs.bfs_shortest_path(self.start_node,self.goal_node)
 
@@ -111,7 +111,7 @@ class GUI(object):
 
         # origin of grid is (0, 0) lower left corner
         # graph.obs_list = ([1,1],)    # in case of one obs. COMMA
-        temp_graph.obs_list = self.graph.obs_list = ([0,0],[0,1],[2,0],[2,1])
+        temp_graph.obs_list = self.graph.obs_list
         
         temp_graph.make_grid()
         temp_graph.connect_nodes()
@@ -174,7 +174,7 @@ class GUI(object):
                 plan.append("d")
         
         print plan
-        
+
         prev = 'u'
         for direction in plan:
             if prev == direction:
@@ -227,8 +227,6 @@ class GUI(object):
     def execute_path(self, actions, index):
         while len(actions)>0:
             if self.robotList:
-                self.robotList[index-1].set_led(0,index*3)
-                self.robotList[index-1].set_led(1,index*3)
                 command = actions.pop(0)
                 if command == 'f':
                     self.move_f(index)
@@ -297,7 +295,7 @@ def main():
     robotList = comm.robotList
 
     root = tk.Tk()
-    root.geometry('1440x900')
+    root.geometry('850x850')
 
     ui = GUI(root, robotList)
 
