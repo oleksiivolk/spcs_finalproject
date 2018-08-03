@@ -72,15 +72,19 @@ def main_boi():
 			# if start
 			if ids[box_index][0] == start_id:
 				start = corners[box_index][0]
+				print "start: " + str(get_aav_coord(start))
 			
 			# if goal
 			elif ids[box_index][0] == goal_id:
 				goal = corners[box_index][0]
+				print "goal: " + str(get_avg_coord(goal))
 
 			# if obs
 			for i in range(len(obs_id)):
 				if ids[box_index][0] in obs_id:
 					obs[i] = get_avg_coord(corners[box_index][0])
+					print "obs: " + str(obs)
+
 
 			cv2.putText(frame,"id="+str(ids[box_index][0])+" ("+str(int(x_avg))+","+str(int(y_avg))+")", (int(x_avg),int(y_avg)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255))
 
@@ -141,6 +145,7 @@ def draw_grid(frame, row, col, corners, ids):
 			grid_line_cols[j] = [p1,p2]
 
 	# find the points and where they lie
+
 
 # def find_loc(frame, row, col, corners, ids):
 # 	# find start
