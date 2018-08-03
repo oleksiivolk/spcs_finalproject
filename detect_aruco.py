@@ -37,8 +37,8 @@ def get_avg_coord(boi):
 	x_avg = 0
 	y_avg = 0 
 	for x,y in boi: # the box
-		x_avg += x/4
-		y_avg += y/4
+		x_avg += x/800
+		y_avg += y/800
 
 	return (x_avg, y_avg)
 
@@ -72,31 +72,21 @@ def main_boi():
 			# if start
 			if ids[box_index][0] == start_id:
 				start = corners[box_index][0]
-				print "start: " + str(get_aav_coord(start))
+				return_dat_boi["start"].append(int(get_aav_coord(start)))
 			
 			# if goal
 			elif ids[box_index][0] == goal_id:
 				goal = corners[box_index][0]
-				print "goal: " + str(get_avg_coord(goal))
+				return_dat_boi["end"].append(int(get_avg_coord(goal)))
 
 			# if obs
 			for i in range(len(obs_id)):
 				if ids[box_index][0] in obs_id:
-					obs[i] = get_avg_coord(corners[box_index][0])
-					print "obs: " + str(obs)
+					obs[i] = int(get_avg_coord(corners[box_index][0]))
+					 return_dat_boi["obs"] = obs
 
 
-			cv2.putText(frame,"id="+str(ids[box_index][0])+" ("+str(int(x_avg))+","+str(int(y_avg))+")", (int(x_avg),int(y_avg)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255))
-
-	 
-		gray = aruco.drawDetectedMarkers(frame, corners)
-		
-		draw_grid(frame, num_rows, num_cols, corners, ids)
-
-		# Display the resulting frame
-		cv2.imshow('frame',frame)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			break
+		return return_dat_boi
 
 def draw_grid(frame, row, col, corners, ids):
 	# draw field boundaries
@@ -158,11 +148,3 @@ def draw_grid(frame, row, col, corners, ids):
 # 	# find obstacles
 # 	if 
 # 	for 
-	
-
-
-main_boi()
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
-
