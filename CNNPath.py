@@ -8,6 +8,7 @@ import logging
 from mr_grid_graph import GridGraph
 from starter_bfs import BFS
 from starter_grid_graph import SimpleGridGraph
+from detect_aruco import *
 
 class GUI(object):
     def __init__(self, root, robotList):
@@ -43,17 +44,16 @@ class GUI(object):
         self.b5.bind('<Button-1>', self.stopProg)
 
     def scanImage(self, event = None):
-        pass
+        d = main_boi()
+        self.obs_list = d["obs"]
+        self.start_node = str(d["start"][0][0]) + "-"+str(d["start"][0][1]) +"-"+ str(d["start"][1][0]) + "-" + str(d["start"][1][1])
+        self.goal_node = str(d["end"][0][0]) + "-"+str(d["end"][0][1]) +"-"+ str(d["end"][1][0]) + "-" + str(d["end"][1][1])
+        
 
     def drawGrid(self, event = None):
         self.graph = GridGraph()
         self.graph.set_grid_rows(3)
         self.graph.set_grid_cols(3)
-
-        self.start_node = '1-0-1-1'
-        self.goal_node = '1-1-1-0'
-
-        self.graph.obs_list = ([0,1],[0,0],[2,0],[2,1])
 
         self.graph.set_start(self.start_node)
         self.graph.set_goal(self.goal_node)
